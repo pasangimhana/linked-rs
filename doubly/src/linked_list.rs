@@ -25,37 +25,29 @@ impl<T> DoublyLinkedList<T> {
                 let mut anchor_borrow = anchor.borrow_mut();
                 let prev_node = anchor_borrow.prev.clone();
 
-                // Set the new node's pointers
-                new_node.borrow_mut().next = Some(anchor.clone());
+                                new_node.borrow_mut().next = Some(anchor.clone());
                 new_node.borrow_mut().prev = prev_node.clone();
 
-                // Update the previous node's next pointer
-                if let Some(prev) = prev_node {
+                                if let Some(prev) = prev_node {
                     prev.borrow_mut().next = Some(new_node.clone());
                 } else {
-                    self.head = Some(new_node.clone()); // Update head if there is no previous node
-                }
+                    self.head = Some(new_node.clone());                 }
 
-                // Update the anchor's previous pointer
-                anchor_borrow.prev = Some(new_node);
+                                anchor_borrow.prev = Some(new_node);
             }
             Side::After => {
                 let mut anchor_borrow = anchor.borrow_mut();
                 let next_node = anchor_borrow.next.clone();
 
-                // Set the new node's pointers
-                new_node.borrow_mut().prev = Some(anchor.clone());
+                                new_node.borrow_mut().prev = Some(anchor.clone());
                 new_node.borrow_mut().next = next_node.clone();
 
-                // Update the next node's previous pointer
-                if let Some(next) = next_node {
+                                if let Some(next) = next_node {
                     next.borrow_mut().prev = Some(new_node.clone());
                 } else {
-                    self.tail = Some(new_node.clone()); // Update tail if there is no next node
-                }
+                    self.tail = Some(new_node.clone());                 }
 
-                // Update the anchor's next pointer
-                anchor_borrow.next = Some(new_node);
+                                anchor_borrow.next = Some(new_node);
             }
         }
     }
@@ -80,27 +72,22 @@ impl<T> DoublyLinkedList<T> {
         }
     }
 
-    // General removal method handling all cases
-    pub fn remove(&mut self, node: Rc<RefCell<Node<T>>>) -> Option<T> {
+        pub fn remove(&mut self, node: Rc<RefCell<Node<T>>>) -> Option<T> {
         let node_borrow = node.borrow();
         let (_prev, next) = (node_borrow.prev.clone(), node_borrow.next.clone());
 
-        // Update the links in previous and next nodes, if they exist
-        if let Some(prev) = _prev.clone() {
+                if let Some(prev) = _prev.clone() {
             prev.borrow_mut().next = next.clone();
         } else {
-            // If no previous node, update the head
-            self.head = next.clone();
+                        self.head = next.clone();
         }
         if let Some(next) = next {
             next.borrow_mut().prev = _prev.clone();
         } else {
-            // If no next node, update the tail
-            self.tail = _prev.clone();
+                        self.tail = _prev.clone();
         }
 
-        // Explicitly drop the borrow to avoid borrowing issues
-        drop(node_borrow);
+                drop(node_borrow);
 
         return Some(Rc::try_unwrap(node)
             .ok()
@@ -109,8 +96,7 @@ impl<T> DoublyLinkedList<T> {
             .data);
     }
 
-    // Updated pop_first to correctly use remove
-    pub fn pop_back(&mut self) -> Option<T> {
+        pub fn pop_back(&mut self) -> Option<T> {
         return self.tail.clone().map(|tail| self.remove(tail)).flatten();
     }
 
@@ -118,3 +104,11 @@ impl<T> DoublyLinkedList<T> {
         return self.head.clone().map(|head| self.remove(head)).flatten();
     }
 }
+
+impl<T> Drop for DoublyLinkedList<T> {
+    fn drop(&mut self) {
+        while self.pop_back().is_some() {}
+    }
+}
+
+
