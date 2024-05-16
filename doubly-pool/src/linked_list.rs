@@ -2,10 +2,10 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use crate::enums::Side;
 use crate::node::Node;
-use crate::nodePool::NodePool;
+use crate::node_pool::NodePool;
 
 #[derive(Debug)]
-pub struct DoublyLinkedList<T> {
+pub struct DoublyLinkedList<T: Clone> {
     pub(crate) head: Option<Rc<RefCell<Node<T>>>>,
     pub(crate) tail: Option<Rc<RefCell<Node<T>>>>,
     pool: NodePool<T>,
@@ -108,5 +108,13 @@ impl<T: Clone> DoublyLinkedList<T> {
 
     pub fn pop_first(&mut self) -> Option<T> {
         return self.head.clone().map(|head| self.remove(head)).flatten();
+    }
+}
+
+impl<T: Clone> Drop for DoublyLinkedList<T> {
+    fn drop(&mut self) {
+        while self.tail.is_some() {
+            self.pop_back();
+        }
     }
 }

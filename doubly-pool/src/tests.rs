@@ -1,5 +1,5 @@
 use crate::enums::Side;
-use crate::linkedList::DoublyLinkedList;
+use crate::linked_list::DoublyLinkedList;
 
 #[cfg(test)]
 mod i32_tests {

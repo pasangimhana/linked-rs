@@ -1,12 +1,13 @@
 mod node;
-mod nodePool;
+mod node_pool;
 mod enums;
-mod linkedList;
+mod linked_list;
 mod tests;
 
 use std::time::SystemTime;
 use crate::enums::Side;
-use crate::linkedList::DoublyLinkedList;
+use crate::linked_list::DoublyLinkedList;
+
 
 #[derive(Debug, Clone, Copy)]
 struct Complex {
@@ -14,91 +15,113 @@ struct Complex {
     imag: f64,
 }
 
-fn test_doubly_linked_list<T: Clone>(init_val: T) -> u128 {
-    let mut custom_list = DoublyLinkedList::new();
-    custom_list.init(1000000, init_val.clone());
-
-    let start_custom = SystemTime::now();
-    for i in 0..1_000_000 {
-        custom_list.push_back(init_val.clone());
-    }
-    let end_custom = SystemTime::now();
-
-    let custom_list_time = end_custom.duration_since(start_custom).unwrap().as_millis();
-    custom_list_time
+#[derive(Debug, Clone)]
+struct User {
+    id: i32,
+    name: String,
+    age: i32,
+    email: String,
 }
 
 fn test_i32_doubly_linked_list() -> u128 {
-    let mut custom_list = DoublyLinkedList::new();
-    custom_list.init(1000000, 346);
-
+    let mut custom_list = linked_list::DoublyLinkedList::new();
+    custom_list.init(10_000_000, 0);
     let start_custom = SystemTime::now();
-    for i in 0..1_000_000 {
+    for i in 0..10_000_000 {
         custom_list.push_back(346);
     }
     let end_custom = SystemTime::now();
-
     let custom_list_time = end_custom.duration_since(start_custom).unwrap().as_millis();
-    custom_list_time
+
+    return custom_list_time;
 }
 
 fn test_f64_doubly_linked_list() -> u128 {
-    let mut custom_list = DoublyLinkedList::new();
-    custom_list.init(1000000, 364.3433);
-
+    let mut custom_list = linked_list::DoublyLinkedList::new();
+    custom_list.init(10_000_000, 0.0);
     let start_custom = SystemTime::now();
-    for i in 0..1_000_000 {
+    for i in 0..10_000_000 {
         custom_list.push_back(364.3433);
     }
     let end_custom = SystemTime::now();
-
     let custom_list_time = end_custom.duration_since(start_custom).unwrap().as_millis();
-    custom_list_time
+
+    return custom_list_time;
 }
 
 fn test_complex_doubly_linked_list() -> u128 {
-    let mut custom_list = DoublyLinkedList::new();
-    custom_list.init(1000000, Complex { real: 999.999, imag: 999.999 });
-
+    let mut custom_list = linked_list::DoublyLinkedList::new();
+    custom_list.init(10_000_000, Complex {
+        real: 0.0,
+        imag: 0.0,
+    });
     let start_custom = SystemTime::now();
-    for i in 0..1_000_000 {
-        custom_list.push_back(Complex { real: 999.999, imag: 999.999 });
+    for i in 0..10_000_000 {
+        custom_list.push_back(Complex {
+            real: 999.999,
+            imag: 999.999,
+        });
     }
     let end_custom = SystemTime::now();
+    let custom_list_time = end_custom.duration_since(start_custom).unwrap().as_millis();
 
-    // sum of all 1,000,000 elements
-    let mut sum: i128 = 0;
-    while let Some(node) = custom_list.pop_first() {
-        let data1 = node.real;
-        let data2 = node.imag;
-        sum += data1 as i128 + data2 as i128;
+    return custom_list_time;
+}
+
+fn test_user_doubly_linked_list() -> u128 {
+    let mut custom_list = linked_list::DoublyLinkedList::new();
+    custom_list.init(10_000_000, User {
+        id: 0,
+        name: "".to_string(),
+        age: 0,
+        email: "".to_string(),
+    });
+    let start_custom = SystemTime::now();
+    for i in 0..10_000_000 {
+        custom_list.push_back(User {
+            id: 1,
+            name: "John Doe".to_string(),
+            age: 30,
+            email: "john@gmail.com".to_string(),
+        });
     }
 
-    println!("{}", sum);
-
+    let end_custom = SystemTime::now();
     let custom_list_time = end_custom.duration_since(start_custom).unwrap().as_millis();
-    custom_list_time
+
+    return custom_list_time;
+}
+
+fn run_test() -> (u128, u128, u128, u128)
+{
+    let i32_time = test_i32_doubly_linked_list();
+    let f64_time = test_f64_doubly_linked_list();
+    let complex_time = test_complex_doubly_linked_list();
+    let user_time = test_user_doubly_linked_list();
+
+    return (i32_time, f64_time, complex_time, user_time);
 }
 
 fn main() {
-    // run it 10 times
-    let mut i32_time = 0;
-    let mut f64_time = 0;
-    let mut complex_time = 0;
+        let mut i32_times = Vec::new();
+    let mut f64_times = Vec::new();
+    let mut complex_times = Vec::new();
+    let mut user_times = Vec::new();
 
-    // for _ in 0..10 {
-    //     i32_time += test_doubly_linked_list(346);
-    //     f64_time += test_doubly_linked_list(364.3433);
-    //     complex_time += test_doubly_linked_list(Complex { real: 999.999, imag: 999.999 });
-    // }
+    for i in 0..10 {
+        let (i32_time, f64_time, complex_time, user_time) = run_test();
+        i32_times.push(i32_time);
+        f64_times.push(f64_time);
+        complex_times.push(complex_time);
+        user_times.push(user_time);
 
-    for _ in 0..10 {
-        i32_time += test_i32_doubly_linked_list();
-        f64_time += test_f64_doubly_linked_list();
-        complex_time += test_complex_doubly_linked_list();
+        println!("Test {} done...", i+1);
     }
 
-    println!("i32: {}ms", i32_time / 10);
-    println!("f64: {}ms", f64_time / 10);
-    println!("Complex: {}ms", complex_time / 10);
+        let mut writer = csv::Writer::from_path("doubly_linked_list.csv").unwrap();
+    writer.write_record(&["i32", "f64", "complex", "user"]).unwrap();
+    for i in 0..10 {
+        writer.write_record(&[i32_times[i].to_string(), f64_times[i].to_string(), complex_times[i].to_string(), user_times[i].to_string()]).unwrap();
+    }
+    writer.flush().unwrap();
 }
